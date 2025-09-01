@@ -3,18 +3,17 @@ require('dotenv').config();
 const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT),
-  secure: true,
+  secure: Number(process.env.SMTP_PORT) === 465,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
@@ -25,15 +24,19 @@ app.post('/send-mail', async (req, res) => {
   const {
     name,
     phone,
-    email, 
+    email,
     selectedHouse,
     selectedTrademark,
     selectedColor,
-    adminEmail, 
+    adminEmail,
     widgetName,
     pdfUrl,
-    translations 
+    translations
   } = req.body;
+
+  if (!name || !phone || !email || !adminEmail || !widgetName || !pdfUrl || !translations) {
+    return res.status(400).json({ success: false, error: 'Missing required fields' });
+  }
 
   const htmlContent = `
       <h2>${translations.form.letter_header} "${widgetName}"</h2>
