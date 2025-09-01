@@ -2,6 +2,7 @@ import { collection, getDocs, addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebase/firebase";
 import { message } from "antd";
+import { convertToWebp } from "../utils/imageUtils";
 
 export const getLanguages = async () => {
   try {
@@ -42,8 +43,9 @@ export const addHouse = async (languageId: string, name: string, file?: File) =>
     let iconUrl = "";
     
     if (file) {
-      const storageRef = ref(storage, `house_icons/${file.name}`);
-      await uploadBytes(storageRef, file);
+      const optimizedFile = await convertToWebp(file);
+      const storageRef = ref(storage, `house_icons/${optimizedFile.name}`);
+      await uploadBytes(storageRef, optimizedFile);
       iconUrl = await getDownloadURL(storageRef);
     }
 

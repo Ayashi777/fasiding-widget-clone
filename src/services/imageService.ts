@@ -3,6 +3,7 @@ import { collection, addDoc, getDocs } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db } from "../firebase/firebase";
 import { message } from "antd";
+import { convertToWebp } from "../utils/imageUtils";
 
 interface ImageData {
   houseName: string;
@@ -13,9 +14,10 @@ interface ImageData {
 
 export const uploadImage = async (file: File): Promise<string | null> => {
   try {
+    const optimizedFile = await convertToWebp(file);
     const storage = getStorage();
-    const storageRef = ref(storage, `images/${file.name}`);
-    await uploadBytes(storageRef, file);
+    const storageRef = ref(storage, `images/${optimizedFile.name}`);
+    await uploadBytes(storageRef, optimizedFile);
     return await getDownloadURL(storageRef);
   } catch (error) {
     message.error("Помилка завантаження зображення:");

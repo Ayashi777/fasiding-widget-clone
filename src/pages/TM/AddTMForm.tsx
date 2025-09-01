@@ -13,6 +13,7 @@ import {
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { convertToWebp } from "../../utils/imageUtils";
 import { addTrademark } from "../../services/trademarkService";
 import { getLanguages } from "../../services/languageService";
 import { getColors } from "../../services/colorService";
@@ -97,10 +98,11 @@ const AddTMForm: React.FC<AddTMFormProps> = ({ refreshTable }) => {
 
   const uploadFile = async (file: File, path: string): Promise<string> => {
     try {
+      const optimizedFile = file.type.startsWith("image/") && path !== "pdfs" ? await convertToWebp(file) : file;
       const storage = getStorage();
-      const uniqueFileName = `${uuidv4()}_${file.name}`;
+      const uniqueFileName = `${uuidv4()}_${optimizedFile.name}`;
       const storageRef = ref(storage, `${path}/${uniqueFileName}`);
-      await uploadBytes(storageRef, file);
+      await uploadBytes(storageRef, optimizedFile);
       return getDownloadURL(storageRef);
     } catch (error) {
       console.error(`Помилка завантаження файлу: ${error}`);
