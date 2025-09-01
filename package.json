@@ -17,7 +17,6 @@
     "@babel/preset-react": "^7.24.7",
     "@tinymce/tinymce-react": "^5.1.1",
     "antd": "^5.20.5",
-    "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "firebase": "^10.13.1",
